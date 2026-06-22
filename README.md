@@ -57,41 +57,28 @@
 ## ⚙️ 节点参数说明
 Banana遵照最后一个图的尺寸出图
 
----
+当前节点支持两个模型：
 
-## 📝 注意事项
+* `Nano Banana Pro`
+  * model id: `gemini-3-pro-image`
+  * image size: `1K` / `2K` / `4K`
+  * aspect ratio: `1:1` `2:3` `3:2` `3:4` `4:3` `4:5` `5:4` `9:16` `16:9` `21:9`
+* `Nano Banana 2`
+  * model id: `gemini-3.1-flash-image-preview`
+  * image size: `0.5K` / `1K` / `2K` / `4K`
+  * aspect ratio: 在 `Nano Banana Pro` 的基础上，额外支持 `1:4` `4:1` `1:8` `8:1`
 
-* 使用前需在节点参数中填写。
-* 如果需要图像输入，请确保传入的图像为支持的格式（PNG、JPG）。
-* Gemini 的调用需要联网，请确保你的 ComfyUI 运行环境可以访问 Gemini API。
-
-## 🆓 方案介绍
-
-Step1️⃣进入Google Cloud https://console.cloud.google.com/
-<img width="1920" height="925" alt="image" src="https://github.com/user-attachments/assets/3b9cdf13-7006-4525-8ef1-b46894385862" />
-点击免费试用
-<img width="1550" height="720" alt="image" src="https://github.com/user-attachments/assets/ed64238b-715e-45f5-a0d5-259d38dab76f" />
-选择香港-随便填写一下信息，建议搜索一下真实存在的街道
-绑定Visa卡（招商银行的Visa支持）
-成功后创建项目
-设置额度（按最小设置即可）
-*不要激活不要激活不要激活！！！
-* <img width="1920" height="910" alt="d592c696-233e-4fc8-8203-b2d7ad553464" src="https://github.com/user-attachments/assets/194a2fd5-5b56-4deb-9473-17078b0fe3f2" />
-Step2️⃣进入Google AI Stuido https://aistudio.google.com/
-点击<img width="534" height="350" alt="aebaa518c13b18bb76690666b5dc0061" src="https://github.com/user-attachments/assets/9a830bd4-bc75-48a7-8048-07cf82747918" />
-选择项目（刚创建的）
-得到APIKEY<img width="1580" height="266" alt="image" src="https://github.com/user-attachments/assets/69ab2a67-f8ea-45c3-b189-d23212608bca" />
-
-Step3️⃣
-复制Key回到Comfyui填进去就可以愉快的感受10秒出图了~~~
+节点 UI 已新增 `model` 选项；`image_size` 和 `aspect_ratio` 会显示并集，实际请求时会按所选模型做校验。
 
 ---
+
 
 ## 🤝 致谢
 
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 社区提供的优秀框架
 * [Google Gemini](https://deepmind.google/technologies/gemini/) 提供的多模态大模型
 * 本项目由 **GeminiBanana** 团队/作者开发与维护
+* 致谢企鹅和原项目 https://github.com/PenguinTeo/Comfyui-GeminiBanana
 
 ---
 

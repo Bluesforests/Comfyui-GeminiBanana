@@ -14,6 +14,38 @@ from google.genai.types import (
 )
 
 
+MODEL_CONFIGS = {
+    "Nano Banana Pro": {
+        "model_id": "models/gemini-3-pro-image",
+        "image_sizes": ["1K", "2K", "4K"],
+        "aspect_ratios": [
+            "1:1", "2:3", "3:2", "3:4", "4:3",
+            "4:5", "5:4", "9:16", "16:9", "21:9",
+        ],
+    },
+    "Nano Banana 2": {
+        "model_id": "models/gemini-3.1-flash-image-preview",
+        "image_sizes": ["0.5K", "1K", "2K", "4K"],
+        "aspect_ratios": [
+            "1:1", "2:3", "3:2", "3:4", "4:3",
+            "4:5", "5:4", "9:16", "16:9", "21:9",
+            "1:4", "4:1", "1:8", "8:1",
+        ],
+    },
+}
+
+MODEL_OPTIONS = list(MODEL_CONFIGS.keys())
+IMAGE_SIZE_OPTIONS = sorted(
+    {size for config in MODEL_CONFIGS.values() for size in config["image_sizes"]},
+    key=lambda value: (float(value[:-1]), value),
+)
+ASPECT_RATIO_OPTIONS = ["AUTO"] + list(dict.fromkeys(
+    ratio
+    for config in MODEL_CONFIGS.values()
+    for ratio in config["aspect_ratios"]
+))
+
+
 #################################################################
 #                   图像转换工具函数（RGB 全程）
 #################################################################
@@ -56,18 +88,10 @@ class Gemini3ImageNode:
                 "api_key": ("STRING", {"default": "", "multiline": False}),
                 "prompt": ("STRING", {"default": "Describe your image...", "multiline": True}),
 
-                # 保持你的 image_size 完全不变
-                "image_size": (["1K", "2K", "4K"], {"default": "1K"}),
+                "model": (MODEL_OPTIONS, {"default": "Nano Banana Pro"}),
+                "image_size": (IMAGE_SIZE_OPTIONS, {"default": "1K"}),
 
-                # 新增 AUTO（不传比例）
-                "aspect_ratio": (
-                    [
-                        "AUTO",  # ⭐ 新增
-                        "1:1", "2:3", "3:2", "3:4", "4:3",
-                        "4:5", "5:4", "9:16", "16:9", "21:9"
-                    ],
-                    {"default": "AUTO"},
-                ),
+                "aspect_ratio": (ASPECT_RATIO_OPTIONS, {"default": "AUTO"}),
 
                 # 新增本地超时控制
                 "timeout_seconds": ("INT", {"default": 60, "min": 10, "max": 600}),
@@ -95,6 +119,7 @@ class Gemini3ImageNode:
         self,
         api_key,
         prompt,
+        model,
         image_size,
         aspect_ratio,
         timeout_seconds,
@@ -104,6 +129,20 @@ class Gemini3ImageNode:
 
         if not api_key.strip():
             raise ValueError("❌ API Key 不能为空")
+
+        if model not in MODEL_CONFIGS:
+            raise ValueError(f"❌ 不支持的模型：{model}")
+
+        model_config = MODEL_CONFIGS[model]
+        if image_size not in model_config["image_sizes"]:
+            raise ValueError(
+                f"❌ {model} 不支持 image_size={image_size}，可选：{', '.join(model_config['image_sizes'])}"
+            )
+        if aspect_ratio != "AUTO" and aspect_ratio not in model_config["aspect_ratios"]:
+            raise ValueError(
+                f"❌ {model} 不支持 aspect_ratio={aspect_ratio}，可选：AUTO, "
+                + ", ".join(model_config["aspect_ratios"])
+            )
 
         client = Client(api_key=api_key.strip())
 
@@ -124,7 +163,7 @@ class Gemini3ImageNode:
         #################################################################
         # ⭐ AUTO 比例：如果选择 AUTO → 不传 aspect_ratio
         #################################################################
-        image_cfg = {"image_size": image_size}  # ⚠ 保持你的原始值 1K/2K/4K
+        image_cfg = {"image_size": image_size}
 
         if aspect_ratio != "AUTO":
             image_cfg["aspect_ratio"] = aspect_ratio
@@ -141,7 +180,7 @@ class Gemini3ImageNode:
 
         def run_request():
             return client.models.generate_content(
-                model="models/gemini-3-pro-image-preview",
+                model=model_config["model_id"],
                 contents=parts,
                 config=gen_config,
             )
