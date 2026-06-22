@@ -98,6 +98,17 @@ class Gemini3ImageNode:
 
                 # 新增重试次数
                 "retry_times": ("INT", {"default": 6, "min": 1, "max": 20}),
+
+                # 仅用于让 ComfyUI 在批量任务中识别输入变化并重新执行
+                "random_seed": (
+                    "INT",
+                    {
+                        "default": 0,
+                        "min": 0,
+                        "max": 0xffffffffffffffff,
+                        "control_after_generate": True,
+                    }
+                ),
             },
 
             # 可选输入图
@@ -124,6 +135,7 @@ class Gemini3ImageNode:
         aspect_ratio,
         timeout_seconds,
         retry_times,
+        random_seed,
         **kwargs
     ):
 
@@ -143,6 +155,9 @@ class Gemini3ImageNode:
                 f"❌ {model} 不支持 aspect_ratio={aspect_ratio}，可选：AUTO, "
                 + ", ".join(model_config["aspect_ratios"])
             )
+
+        # Gemini 图像接口当前没有公开 seed 参数，这里保留该输入仅用于触发节点重跑。
+        _ = random_seed
 
         client = Client(api_key=api_key.strip())
 

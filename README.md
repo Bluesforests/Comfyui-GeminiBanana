@@ -69,6 +69,7 @@ Banana遵照最后一个图的尺寸出图
   * aspect ratio: 在 `Nano Banana Pro` 的基础上，额外支持 `1:4` `4:1` `1:8` `8:1`
 
 节点 UI 已新增 `model` 选项；`image_size` 和 `aspect_ratio` 会显示并集，实际请求时会按所选模型做校验。
+另外新增了 `random_seed` 参数，用于让 ComfyUI 在批量生成时识别输入变化并重新执行节点；它不是 Gemini API 的真实 seed，并且会在每次生成后按 ComfyUI 的种子控件逻辑自动更新。
 
 ---
 
